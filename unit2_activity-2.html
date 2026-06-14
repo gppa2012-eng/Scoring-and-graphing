@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unit 2 — Oral Reading Fluency Activity</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --gold: #ffc629;
+  --gold-lt: #fff8e1;
+  --black: #000;
+  --gray: #b0b3b2;
+  --body: 'Barlow', sans-serif;
+  --display: 'Barlow Condensed', sans-serif;
+  --red: #e24b4a;
+  --blue: #185FA5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--body); background: #f0f0f0; color: #222; }
+
+.page { max-width: 820px; margin: 28px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+
+/* HEADER */
+.page-header { background: var(--black); padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; }
+.header-left .unit-badge { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.header-left .unit-title { font-family: var(--display); font-size: 22px; font-weight: 700; color: white; }
+.score-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--gold); border: 1px solid rgba(255,198,41,0.4); padding: 6px 14px; border-radius: 20px; }
+.score-box input { border: none; border-bottom: 1px solid rgba(255,198,41,0.5); background: transparent; width: 32px; text-align: center; font-size: 13px; font-weight: 700; color: var(--gold); font-family: var(--body); outline: none; }
+
+/* META */
+.meta-row { display: flex; align-items: center; gap: 20px; padding: 12px 40px; background: #f8f8f8; border-bottom: 1px solid #e8e8e8; }
+.meta-field { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #888; }
+.meta-field input { border: none; border-bottom: 1px solid #ccc; background: transparent; font-size: 13px; font-family: var(--body); color: #222; outline: none; width: 160px; padding: 2px 4px; }
+.meta-field input:focus { border-bottom-color: var(--gold); }
+
+/* BODY */
+.body { padding: 32px 40px 48px; }
+
+/* OVERVIEW */
+.overview { background: var(--gold-lt); border-left: 4px solid var(--gold); border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 14px; color: #444; line-height: 1.75; margin-bottom: 28px; }
+
+/* VIDEO CARD */
+.video-card { display: flex; align-items: center; gap: 14px; background: #f8f8f8; border: 1px solid #e0e0e0; border-radius: 10px; padding: 14px 18px; text-decoration: none; margin-bottom: 28px; transition: border-color 0.15s, background 0.15s; }
+.video-card:hover { border-color: var(--gold); background: var(--gold-lt); }
+.video-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--black); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.video-icon svg { fill: var(--gold); width: 18px; }
+.video-title { font-size: 15px; font-weight: 700; color: #000; }
+.video-sub { font-size: 12px; color: #888; margin-top: 3px; }
+.video-arrow { margin-left: auto; font-size: 20px; color: #aaa; }
+
+/* SECTION HEADERS */
+.section-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.step-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--gold); font-size: 13px; font-weight: 700; color: var(--black); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.step-title { font-size: 15px; font-weight: 700; color: var(--black); }
+.step-dir { font-size: 13px; color: #888; margin-top: 2px; }
+.section-gap { margin-bottom: 32px; }
+
+/* TOOLBAR */
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.tool-btn { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 8px; border: 1.5px solid #ddd; background: white; cursor: pointer; font-family: var(--body); color: #555; display: flex; align-items: center; gap: 6px; transition: all 0.12s; }
+.tool-btn:hover { border-color: #aaa; }
+.tool-btn.error-mode { border-color: var(--red); background: var(--red); color: white; }
+.tool-btn.bracket-mode { border-color: var(--blue); background: var(--blue); color: white; }
+.tool-btn.reset-btn { color: #aaa; border-color: #e0e0e0; }
+.mode-hint { font-size: 12px; color: #aaa; font-style: italic; }
+
+/* LEGEND */
+.legend { display: flex; gap: 16px; margin-bottom: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #888; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+.legend-bracket { width: 4px; height: 14px; border-radius: 1px; }
+
+/* PASSAGE */
+.passage-title { font-family: var(--display); font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 18px; letter-spacing: 0.02em; }
+.passage-wrap { border: 1px solid #e8e8e8; border-radius: 10px; padding: 20px 24px; background: #fafafa; margin-bottom: 16px; }
+.passage-line { display: flex; align-items: baseline; gap: 12px; }
+.line-words { flex: 1; line-height: 2.8; font-size: 15px; color: #333; }
+.line-count { font-size: 11px; color: #aaa; min-width: 36px; text-align: right; flex-shrink: 0; padding-top: 4px; }
+
+.word { display: inline-block; cursor: pointer; padding: 1px 2px; border-radius: 3px; margin: 0 1px; transition: background 0.1s; }
+.word:hover { background: #f0f0f0; }
+.word.error { color: var(--red); text-decoration: line-through; font-weight: 600; }
+.word.bracket-end { border-right: 3px solid var(--blue); padding-right: 4px; }
+
+/* TOTALS */
+.totals { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px; }
+.total-card { background: #f8f8f8; border: 1px solid #e8e8e8; border-radius: 10px; padding: 12px 16px; text-align: center; }
+.total-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #aaa; margin-bottom: 6px; }
+.total-value { font-size: 28px; font-weight: 700; color: #222; }
+.total-value.wcpm { color: var(--blue); }
+.total-note { font-size: 11px; color: #aaa; margin-bottom: 28px; }
+
+/* DATA TABLE */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px; }
+.data-table th { background: var(--black); color: var(--gold); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 12px; text-align: left; }
+.data-table td { border: 1px solid #e8e8e8; padding: 0; }
+.row-label { padding: 10px 12px; font-size: 12px; font-weight: 700; color: #555; background: #f8f8f8; width: 140px; }
+.row-label.baseline { border-left: 3px solid var(--gray); }
+.row-label.instructional { border-left: 3px solid var(--gold); }
+.data-input { width: 100%; border: none; background: transparent; font-size: 13px; font-family: var(--body); color: #222; padding: 10px 12px; outline: none; text-align: center; }
+.data-input:focus { background: var(--gold-lt); }
+
+/* GRAPH */
+.graph-note { font-size: 12px; color: #888; font-style: italic; margin-bottom: 10px; }
+.chart-wrap { border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px; background: white; margin-bottom: 10px; }
+.graph-legend { display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
+.gl-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #888; }
+.gl-dot { width: 10px; height: 10px; border-radius: 50%; }
+.gl-line { width: 18px; height: 2px; border-radius: 1px; }
+.graph-actions { display: flex; justify-content: flex-end; }
+.clear-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: 1px solid #ddd; background: white; cursor: pointer; font-family: var(--body); color: #888; }
+.clear-btn:hover { background: #f8f8f8; }
+
+.divider { border: none; border-top: 1px solid #e8e8e8; margin: 28px 0; }
+
+@media print { body { background: white; } .page { box-shadow: none; margin: 0; border-radius: 0; } }
+</style>
+</head>
+<body>
+
+<div style="background:#000;color:#ffc629;padding:14px 32px;font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.03em;position:sticky;top:0;z-index:100;">
+  &#9432; When you&#39;re done: go to <strong>File → Save As → PNG</strong> in your browser to save your completed activity. PNG captures everything — marked errors, bracket, and graph points. Submit the PNG to D2L.
+</div>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="unit-badge">Unit 2 · Practice Activity</div>
+      <div class="unit-title">Scoring Oral Reading Fluency & Graphing Progress Data</div>
+    </div>
+  </div>
+
+  <!-- META -->
+
+
+  <div class="body">
+
+    <!-- OVERVIEW -->
+    <div class="overview">
+      In this activity, you'll score a student's oral reading fluency in real time and then graph the data to see what it tells you about their progress. Watch the video, mark errors directly on the passage below, then enter CWPM data from multiple sessions and plot it on a progress graph.
+    </div>
+
+    <!-- VIDEO LINK -->
+    <a class="video-card" href="https://www.youtube.com/watch?v=BNs9dzm6a18" target="_blank">
+      <div class="video-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <div>
+        <p class="video-title">Oral Reading Fluency — Student Video</p>
+        <p class="video-sub">YouTube · watch and score along in real time</p>
+      </div>
+      <div class="video-arrow">↗</div>
+    </a>
+
+    <!-- STEP 1: SCORE THE PASSAGE -->
+    <div class="section-hdr section-gap" style="margin-bottom:10px;">
+      <div class="step-circle">1</div>
+      <div>
+        <p class="step-title">Score the passage</p>
+        <p class="step-dir">As the student reads, click words to mark errors and use the bracket tool to mark the last word read.</p>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div><span>Click a word to mark as an error</span></div>
+      <div class="legend-item"><div class="legend-bracket" style="background:var(--blue);"></div><span>Bracket marks last word read</span></div>
+    </div>
+
+    <div class="toolbar">
+      <button class="tool-btn error-mode" id="errorBtn" onclick="setMode('error')">✕ Mark error</button>
+      <button class="tool-btn" id="bracketBtn" onclick="setMode('bracket')">] Last word read</button>
+      <button class="tool-btn reset-btn" onclick="resetPassage()">↺ Reset</button>
+      <span class="mode-hint" id="modeHint">Click any word to mark it as an error</span>
+    </div>
+
+    <p class="passage-title">Juan's Animals</p>
+    <div class="passage-wrap">
+      <div id="passage"></div>
+    </div>
+
+    <div class="totals">
+      <div class="total-card">
+        <div class="total-label">Total words read</div>
+        <div class="total-value" id="twr">—</div>
+      </div>
+      <div class="total-card">
+        <div class="total-label">Total errors</div>
+        <div class="total-value" id="terr">0</div>
+      </div>
+      <div class="total-card">
+        <div class="total-label">CWPM</div>
+        <div class="total-value wcpm" id="twcpm">—</div>
+      </div>
+    </div>
+    <p class="total-note">WCPM = words read up to bracket − errors. Use the bracket tool to mark the last word the student read.</p>
+
+    <hr class="divider" />
+
+    <!-- STEP 2: DATA TABLE -->
+    <div class="section-hdr" style="margin-bottom:10px;">
+      <div class="step-circle">2</div>
+      <div>
+        <p class="step-title">Review CWPM data</p>
+        <p class="step-dir">The table below shows this student's CWPM scores across six sessions. Use it to plot the data in Step 3.</p>
+      </div>
+    </div>
+
+    <table class="data-table" style="margin-bottom:28px;">
+      <thead><tr><th>Session</th><th>Date</th><th>CWPM</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="row-label baseline">Baseline 1</td><td><input class="data-input" value="Sept 4" /></td><td><input class="data-input" value="42" /></td><td><input class="data-input" value="First probe — cold read" /></td></tr>
+        <tr><td class="row-label baseline">Baseline 2</td><td><input class="data-input" value="Sept 6" /></td><td><input class="data-input" value="38" /></td><td><input class="data-input" value="Similar passage, same level" /></td></tr>
+        <tr><td class="row-label baseline">Baseline 3</td><td><input class="data-input" value="Sept 8" /></td><td><input class="data-input" value="40" /></td><td><input class="data-input" value="Stable, no growth" /></td></tr>
+        <tr><td class="row-label instructional">Instructional 1</td><td><input class="data-input" value="Sept 18" /></td><td><input class="data-input" value="52" /></td><td><input class="data-input" value="After 2 wks of instruction" /></td></tr>
+        <tr><td class="row-label instructional">Instructional 2</td><td><input class="data-input" value="Sept 25" /></td><td><input class="data-input" value="64" /></td><td><input class="data-input" value="Steady growth" /></td></tr>
+        <tr><td class="row-label instructional">Instructional 3</td><td><input class="data-input" value="Oct 2" /></td><td><input class="data-input" value="80" /></td><td><input class="data-input" value="Strong response to intervention" /></td></tr>
+      </tbody>
+    </table>
+
+    <!-- STEP 3: GRAPH -->
+    <div class="section-hdr" style="margin-bottom:10px;">
+      <div class="step-circle">3</div>
+      <div>
+        <p class="step-title">Plot the data</p>
+        <p class="step-dir">Click on the graph to plot each session's CWPM. Points snap to the nearest 20. Click a point again to remove it.</p>
+      </div>
+    </div>
+
+    <div class="graph-legend">
+      <div class="gl-item"><div class="gl-dot" style="background:var(--gray);border:1.5px solid #888;"></div><span>Baseline</span></div>
+      <div class="gl-item"><div class="gl-dot" style="background:var(--gold);border:1.5px solid #000;"></div><span>Instructional</span></div>
+      <div class="gl-item"><div class="gl-line" style="background:#333;border-top:2px dashed #333;"></div><span>Phase line</span></div>
+    </div>
+
+    <div class="chart-wrap">
+      <canvas id="graphCanvas" height="280"></canvas>
+    </div>
+    <div class="graph-actions">
+      <button class="clear-btn" onclick="clearGraph()">Clear graph</button>
+    </div>
+
+  </div><!-- end body -->
+</div><!-- end page -->
+
+<script>
+/* ── PASSAGE ── */
+var lines = [
+  { words: "On the first day of fourth grade, Juan had a question for his family:", count: 14 },
+  { words: "what did his animals do when he was at school? Juan had five pets: a dog, a", count: 31 },
+  { words: "cat, a guinea pig, an iguana, and a turtle. His mother and siblings said they", count: 46 },
+  { words: "probably napped. His father said they probably napped and hatched schemes", count: 57 },
+  { words: "about how to overthrow their owners. Juan thought these possibilities were", count: 68 },
+  { words: "all likely. However, he wanted to know for sure. So he set up video cameras.", count: 83 },
+  { words: "He put one camera in the living room, where his dog Cody slept. He", count: 97 },
+  { words: "put another in the bathroom, where Finn's litter box was. The guinea pig,", count: 110 },
+  { words: "Myron, lived in Juan's bedroom; he put a third camera on the dresser. Iggy", count: 124 },
+  { words: "and Tut, the iguana and the turtle, lived in the garage. Juan placed the last", count: 139 },
+  { words: "camera in front of their two tanks. Then he sprinted to the school bus.", count: 153 },
+  { words: "That night, Juan and his mother and siblings sat down to watch the", count: 166 },
+  { words: "video footage. All the animals were where they should be. Cody and Finn", count: 179 },
+  { words: "lay at Juan's feet. His father went into the kitchen to make dinner. Juan had", count: 194 },
+  { words: "barely pressed play on the first recording when he heard his dad yelp.", count: 207 },
+  { words: '"I think I know what the pets do," he said. Everyone filed into the', count: 221 },
+  { words: "kitchen. They saw the evidence: flour, eggs, and milk were spilled all over", count: 234 },
+  { words: "the floor. Five distinct sets of animal feet had walked across the mess,", count: 247 },
+  { words: "leaving their hungry little tracks.", count: 252 }
+];
+
+var mode = 'error';
+var bracketEl = null;
+var wordEls = [];
+
+function buildPassage() {
+  var container = document.getElementById('passage');
+  if (!container) return;
+  container.innerHTML = '';
+  wordEls = [];
+  for (var li = 0; li < lines.length; li++) {
+    var line = lines[li];
+    var lineDiv = document.createElement('div');
+    lineDiv.className = 'passage-line';
+    var wordsSpan = document.createElement('span');
+    wordsSpan.className = 'line-words';
+    var ws = line.words.split(' ');
+    for (var wi = 0; wi < ws.length; wi++) {
+      var sp = document.createElement('span');
+      sp.className = 'word';
+      sp.textContent = ws[wi] + ' ';
+      sp.dataset.idx = wordEls.length;
+      (function(el) {
+        el.onclick = function() { handleWordClick(el); };
+      })(sp);
+      wordsSpan.appendChild(sp);
+      wordEls.push(sp);
+    }
+    var cntSpan = document.createElement('span');
+    cntSpan.className = 'line-count';
+    cntSpan.textContent = '(' + line.count + ')';
+    lineDiv.appendChild(wordsSpan);
+    lineDiv.appendChild(cntSpan);
+    container.appendChild(lineDiv);
+  }
+}
+
+function handleWordClick(sp) {
+  if (mode === 'error') {
+    if (sp.classList.contains('error')) {
+      sp.classList.remove('error');
+    } else {
+      sp.classList.add('error');
+    }
+  } else {
+    if (bracketEl) bracketEl.classList.remove('bracket-end');
+    if (bracketEl === sp) {
+      bracketEl = null;
+    } else {
+      sp.classList.add('bracket-end');
+      bracketEl = sp;
+    }
+  }
+  updateTotals();
+}
+
+function setMode(m) {
+  mode = m;
+  var eb = document.getElementById('errorBtn');
+  var bb = document.getElementById('bracketBtn');
+  var hint = document.getElementById('modeHint');
+  if (m === 'error') {
+    eb.className = 'tool-btn error-mode';
+    bb.className = 'tool-btn';
+    hint.textContent = 'Click any word to mark it as an error';
+  } else {
+    eb.className = 'tool-btn';
+    bb.className = 'tool-btn bracket-mode';
+    hint.textContent = 'Click the last word the student read';
+  }
+}
+
+function resetPassage() {
+  for (var i = 0; i < wordEls.length; i++) {
+    wordEls[i].classList.remove('error', 'bracket-end');
+  }
+  bracketEl = null;
+  updateTotals();
+}
+
+function updateTotals() {
+  var errors = 0;
+  for (var i = 0; i < wordEls.length; i++) {
+    if (wordEls[i].classList.contains('error')) errors++;
+  }
+  document.getElementById('terr').textContent = errors;
+  if (bracketEl) {
+    var wordsRead = parseInt(bracketEl.dataset.idx) + 1;
+    document.getElementById('twr').textContent = wordsRead;
+    document.getElementById('twcpm').textContent = Math.max(0, wordsRead - errors);
+  } else {
+    document.getElementById('twr').textContent = '—';
+    document.getElementById('twcpm').textContent = '—';
+  }
+}
+
+buildPassage();
+
+/* ── GRAPH ── */
+var canvas = document.getElementById('graphCanvas');
+var ctx = canvas.getContext('2d');
+var W, H, PAD, plotW, plotH;
+var SESSIONS = 6;
+var MAX_CWPM = 160;
+var SNAP = 20;
+var points = [
+  { session: 1, cwpm: 40 },
+  { session: 2, cwpm: 40 },
+  { session: 3, cwpm: 40 },
+  { session: 4, cwpm: 60 },
+  { session: 5, cwpm: 60 },
+  { session: 6, cwpm: 80 }
+];
+
+function initGraph() {
+  var rect = canvas.parentElement.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  W = rect.width - 32;
+  H = 280;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+  PAD = { top: 28, right: 24, bottom: 46, left: 52 };
+  plotW = W - PAD.left - PAD.right;
+  plotH = H - PAD.top - PAD.bottom;
+  drawGraph();
+}
+
+function sx(s) { return PAD.left + ((s - 0.5) / SESSIONS) * plotW; }
+function cy(c) { return PAD.top + plotH - (Math.min(c, MAX_CWPM) / MAX_CWPM) * plotH; }
+
+function drawGraph() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.font = '11px Barlow, sans-serif';
+  ctx.fillStyle = '#888';
+  ctx.textAlign = 'right';
+  for (var v = 0; v <= MAX_CWPM; v += SNAP) {
+    var y = cy(v);
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + plotW, y); ctx.stroke();
+    ctx.fillText(v, PAD.left - 7, y + 4);
+  }
+  ctx.textAlign = 'center';
+  for (var s = 1; s <= SESSIONS; s++) {
+    var x = sx(s);
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + plotH); ctx.stroke();
+    ctx.fillStyle = '#666';
+    ctx.fillText('Session ' + s, x, PAD.top + plotH + 16);
+  }
+  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+  ctx.strokeRect(PAD.left, PAD.top, plotW, plotH);
+
+  // Phase line
+  var px = PAD.left + (3 / SESSIONS) * plotW;
+  ctx.setLineDash([5, 4]); ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(px, PAD.top - 6); ctx.lineTo(px, PAD.top + plotH + 6); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Phase labels
+  ctx.font = '10px Barlow, sans-serif'; ctx.fillStyle = '#aaa'; ctx.textAlign = 'center';
+  ctx.fillText('Baseline', PAD.left + (1.5 / SESSIONS) * plotW, PAD.top - 10);
+  ctx.fillText('Instructional', PAD.left + (4.5 / SESSIONS) * plotW, PAD.top - 10);
+
+  // Y axis label
+  ctx.save();
+  ctx.translate(14, PAD.top + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center'; ctx.fillStyle = '#888'; ctx.font = '11px Barlow, sans-serif';
+  ctx.fillText('CWPM', 0, 0);
+  ctx.restore();
+
+  // Draw lines
+  var base = points.filter(function(p) { return p.session <= 3; }).sort(function(a,b) { return a.session - b.session; });
+  var inst = points.filter(function(p) { return p.session > 3; }).sort(function(a,b) { return a.session - b.session; });
+
+  function drawLine(pts, color) {
+    if (pts.length < 2) return;
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2;
+    pts.forEach(function(p, i) {
+      var xx = sx(p.session), yy = cy(p.cwpm);
+      i === 0 ? ctx.moveTo(xx, yy) : ctx.lineTo(xx, yy);
+    });
+    ctx.stroke();
+  }
+  drawLine(base, '#b0b3b2');
+  drawLine(inst, '#ffc629');
+
+  // Draw points
+  points.forEach(function(p) {
+    var xx = sx(p.session), yy = cy(p.cwpm);
+    var isB = p.session <= 3;
+    ctx.beginPath(); ctx.arc(xx, yy, 7, 0, Math.PI * 2);
+    ctx.fillStyle = isB ? '#b0b3b2' : '#ffc629'; ctx.fill();
+    ctx.strokeStyle = isB ? '#888' : '#000'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = isB ? '#444' : '#000'; ctx.font = '11px Barlow, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(p.cwpm, xx, yy - 12);
+  });
+}
+
+canvas.addEventListener('click', function(e) {
+  var rect = canvas.getBoundingClientRect();
+  var mx = e.clientX - rect.left;
+  var my = e.clientY - rect.top;
+  if (mx < PAD.left || mx > PAD.left + plotW || my < PAD.top || my > PAD.top + plotH) return;
+  var session = Math.ceil(((mx - PAD.left) / plotW) * SESSIONS);
+  var rawC = ((PAD.top + plotH - my) / plotH) * MAX_CWPM;
+  var snapped = Math.max(0, Math.min(MAX_CWPM, Math.round(rawC / SNAP) * SNAP));
+  var idx = -1;
+  for (var i = 0; i < points.length; i++) {
+    if (points[i].session === session) { idx = i; break; }
+  }
+  if (idx >= 0) points.splice(idx, 1);
+  else points.push({ session: session, cwpm: snapped });
+  drawGraph();
+});
+
+function clearGraph() { points = []; drawGraph(); }
+
+window.addEventListener('load', initGraph);
+window.addEventListener('resize', initGraph);
+</script>
+</body>
+</html>
